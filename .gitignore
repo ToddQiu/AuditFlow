@@ -4,6 +4,12 @@
 !/requirements.txt
 !/README.md
 !/DESIGN.md
+!/packaging/
+!/packaging/*.iss
+!/packaging/*.ps1
+!/.github/
+!/.github/workflows/
+!/.github/workflows/*.yml
 !/web/
 /web/*
 !/web/*.js

@@ -1,0 +1,32 @@
+.masthead.desktop-shell {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  user-select: none;
+}
+.desktop-brand { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.window-controls { display: flex; gap: 0; flex-shrink: 0; }
+.window-controls button {
+  width: 28px; height: 30px; min-height: 0; padding: 8px;
+  display: grid; place-items: center; border: 0; border-radius: 6px;
+  background: transparent; box-shadow: none; cursor: default;
+}
+.window-controls button:focus-visible { outline: 2px solid #3478c8; outline-offset: 0; }
+.window-controls .signal {
+  width: 13px; height: 13px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid rgba(0, 0, 0, .12);
+}
+.window-controls .close .signal { background: #ff5f57; }
+.window-controls .minimize .signal { background: #febc2e; }
+.window-controls .maximize .signal { background: #28c840; }
+.window-controls svg { width: 9px; height: 9px; stroke: #42372d; stroke-width: 1.4; fill: none; opacity: 0; }
+.window-controls:hover svg, .window-controls button:focus-visible svg { opacity: 1; }
+.window-resize {
+  position: fixed; right: 0; bottom: 0; z-index: 101;
+  width: 22px; height: 22px; min-height: 0; padding: 0;
+  background: #eeedec; border: 0; border-radius: 4px 0 0 0; cursor: nwse-resize;
+}
+.window-resize::after {
+  content: ''; position: absolute; right: 5px; bottom: 5px;
+  width: 7px; height: 7px; border-right: 2px solid #777; border-bottom: 2px solid #777;
+}

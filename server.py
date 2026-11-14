@@ -1,6 +1,6 @@
 """Local-only audit data workspace. All input files are read-only."""
 from __future__ import annotations
-import argparse, csv, hashlib, io, json, mimetypes, os, secrets, sqlite3, subprocess, threading, time, uuid
+import argparse, csv, hashlib, io, json, mimetypes, os, secrets, sqlite3, subprocess, sys, threading, time, uuid
 from datetime import date
 from collections import Counter, OrderedDict
 from contextlib import contextmanager
@@ -12,14 +12,15 @@ from urllib.parse import parse_qs, urlparse, unquote
 APP = Path(__file__).resolve().parent
 ROOT = Path(r'E:\CodeX\Acenda Caeht')
 RESEARCH = APP / 'research'
-OUTPUT = APP / 'outputs'
-OUTPUT.mkdir(exist_ok=True)
+DATA = Path(os.environ['LOCALAPPDATA']) / 'AuditFlow' / 'data' if getattr(sys, 'frozen', False) else APP
+OUTPUT = DATA / 'outputs'
+OUTPUT.mkdir(parents=True, exist_ok=True)
 TOKEN = secrets.token_urlsafe(32)
-DB = APP / 'workspace.sqlite3'
+DB = DATA / 'workspace.sqlite3'
 CACHE = OrderedDict()
 LOCK = threading.RLock()
 KNOWN = {str(Path(i['path']).resolve()):i for i in (json.loads((RESEARCH/'inventory.json').read_text(encoding='utf-8')) if (RESEARCH/'inventory.json').exists() else [])}
-LIBRARY_ROOT = APP / '客户资料'
+LIBRARY_ROOT = DATA / '客户资料'
 LIBRARIES = {}
 
 def document_library():
@@ -442,7 +443,8 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--port',type=int,default=8776); args=parser.parse_args()
     server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
-    print(f'AuditFlow http://127.0.0.1:{args.port}',flush=True)
+    if sys.stdout is not None:
+        print(f'AuditFlow http://127.0.0.1:{args.port}',flush=True)
     server.serve_forever()
 
 if __name__=='__main__': main()

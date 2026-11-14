@@ -8,7 +8,8 @@ from contextlib import ExitStack
 
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE / '_deps'))
-sys.stdout.reconfigure(encoding='utf-8')
+if sys.stdout is not None and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 logging.getLogger('pypdf').setLevel(logging.ERROR)
 warnings.filterwarnings('ignore')
 S = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'

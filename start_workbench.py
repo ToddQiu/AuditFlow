@@ -15,16 +15,48 @@ OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
 def open_desktop_window():
-    candidates = [Path(os.environ.get(key, fallback)) / 'Microsoft/Edge/Application/msedge.exe'
-                  for key, fallback in [('ProgramFiles(x86)', r'C:\Program Files (x86)'),
-                                        ('ProgramFiles', r'C:\Program Files')]]
-    edge = next((path for path in candidates if path.is_file()), None)
-    if edge is None:
-        raise RuntimeError('AuditFlow 独立窗口需要 Microsoft Edge，请安装后重试。')
-    profile = Path(os.environ.get('LOCALAPPDATA', str(Path.home() / 'AppData/Local'))) / 'AuditFlow/desktop-profile'
-    subprocess.Popen([str(edge), '--app=' + URL, '--user-data-dir=' + str(profile),
-                      '--no-first-run', '--no-default-browser-check', '--window-size=1440,960'],
-                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    import webview
+
+    controls = WindowControls()
+    window = webview.create_window(
+        'AuditFlow · 香港审计数据填列工作台', URL, js_api=controls,
+        width=1440, height=960, min_size=(800, 600), frameless=True,
+        easy_drag=False, shadow=True, text_select=True, background_color='#faf9f6',
+    )
+    controls._window = window
+    window.events.maximized += controls._on_maximized
+    window.events.restored += controls._on_restored
+    webview.settings['ALLOW_DOWNLOADS'] = True
+    webview.settings['DRAG_REGION_DIRECT_TARGET_ONLY'] = True
+    webview.start(gui='edgechromium', icon=str(ROOT / 'assets/audit-a-20261011.ico'))
+
+
+class WindowControls:
+    def __init__(self):
+        self._window = None
+        self._maximized = False
+
+    def close(self):
+        self._window.destroy()
+
+    def minimize(self):
+        self._window.minimize()
+
+    def resize(self, width, height):
+        if not self._maximized:
+            self._window.resize(max(800, int(width)), max(600, int(height)))
+
+    def toggle_maximize(self):
+        if self._maximized:
+            self._window.restore()
+        else:
+            self._window.maximize()
+
+    def _on_maximized(self):
+        self._maximized = True
+
+    def _on_restored(self):
+        self._maximized = False
 
 
 def is_ready():
@@ -44,9 +76,14 @@ def is_ready():
 
 def main():
     if not is_ready():
-        with (ROOT / 'launcher.log').open('ab') as log:
+        frozen = getattr(sys, 'frozen', False)
+        log_dir = Path(os.environ['LOCALAPPDATA']) / 'AuditFlow' if frozen else ROOT
+        log_dir.mkdir(parents=True, exist_ok=True)
+        command = ([sys.executable, '--serve'] if frozen else
+                   [sys.executable, '-X', 'utf8', '-u', str(ROOT / 'server.py')])
+        with (log_dir / 'launcher.log').open('ab') as log:
             subprocess.Popen(
-                [sys.executable, '-X', 'utf8', '-u', str(ROOT / 'server.py'), '--port', '8776'],
+                command + ['--port', '8776'],
                 cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=log,
                 creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
             )
@@ -61,7 +98,12 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        if '--serve' in sys.argv:
+            sys.argv.remove('--serve')
+            import server
+            server.main()
+        else:
+            main()
     except Exception as error:
         if sys.platform == 'win32':
             ctypes.windll.user32.MessageBoxW(None, str(error), 'AuditFlow', 0x10)

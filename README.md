@@ -11,7 +11,11 @@ Windows 本地香港审计资料整理与数据填列工作台。客户资料留
 
 ## 安装与启动
 
-需要 Windows、Python 3.11+；独立窗口使用 Microsoft Edge 应用模式。
+Windows 安装包见仓库 Releases，内含 Python；需要系统安装 Microsoft Edge WebView2 Runtime。安装后生成桌面入口。安装版的数据保存在 `%LOCALAPPDATA%\AuditFlow\data`，不会自动迁移源码目录下已有的资料和数据库。升级、卸载不会主动删除此数据目录。首次发行尚未进行代码签名。
+
+构建安装包：安装本文件所列 Python 依赖、PyInstaller 和 Inno Setup 6，运行 `./packaging/build.ps1`。输出为 `dist/AuditFlow-Setup-0.1.0.exe` 与校验文件。
+
+需要 Windows、Python 3.11+ 和 Microsoft Edge WebView2 Runtime；独立窗口使用 pywebview，窗口按钮与导航栏合并为一行。左侧红、黄、绿按钮分别关闭、最小化、最大化／还原；拖动导航栏空白处移动窗口，双击空白处最大化／还原。右下角可拖动调整窗口大小。更新后关闭旧窗口，再从桌面图标打开。
 
 ```powershell
 python -m pip install -r requirements.txt
