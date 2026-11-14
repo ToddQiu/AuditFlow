@@ -7,6 +7,7 @@
 !/packaging/
 !/packaging/*.iss
 !/packaging/*.ps1
+!/packaging/*.py
 !/.github/
 !/.github/workflows/
 !/.github/workflows/*.yml

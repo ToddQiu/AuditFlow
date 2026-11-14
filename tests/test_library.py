@@ -132,7 +132,7 @@ class LibraryHttpTests(unittest.TestCase):
                             with urlopen(url+route) as response: return json.load(response)
                         listing = get('/api/library')
                         self.assertEqual(listing['files'][0]['category'], 'management')
-                        self.assertEqual(get('/api/files?kind=workbook')['files'][0]['path'], str(source))
+                        self.assertEqual(get('/api/files?kind=workbook')['files'][0]['path'], str(source.resolve()))
                         book = get('/api/workbook?path='+quote(str(source)))
                         self.assertIn('ClosingBalances', [s['name'] for s in book['sheets']])
                         spec={'path':str(source),'sheet':'ClosingBalances','first_row':2,'last_row':4,

@@ -77,7 +77,7 @@ class DemoStorageTests(unittest.TestCase):
         self.assertEqual(len(server.KNOWN), 4)
         self.assertTrue(all(Path(path).parent == self.examples.resolve() for path in server.KNOWN))
         self.assertTrue(all(Path(path).suffix in {'.xlsx', '.docx'} for path in server.KNOWN))
-        self.assertEqual(server.source_path(str(self.examples / 'balances.xlsx'), ['.xlsx']), self.examples / 'balances.xlsx')
+        self.assertEqual(server.source_path(str(self.examples / 'balances.xlsx'), ['.xlsx']), (self.examples / 'balances.xlsx').resolve())
         with self.assertRaisesRegex(ValueError, '已登记'):
             server.source_path(str(outside), ['.xlsx'])
         with self.assertRaisesRegex(ValueError, '已登记'):

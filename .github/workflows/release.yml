@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/release.yml'
+      - 'packaging/**'
 permissions:
   contents: write
 jobs:
@@ -18,6 +19,8 @@ jobs:
       - run: python -m unittest discover -s tests -q
       - shell: pwsh
         run: ./packaging/build.ps1
+      - name: Test packaged backend
+        run: python packaging/smoke.py
       - name: Publish installer
         shell: pwsh
         env:
